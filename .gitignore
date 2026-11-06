@@ -1,0 +1,64 @@
+# Dependencies, build output, and local reports
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+*.log
+.DS_Store
+
+# Credentials and machine-local configuration
+.env*
+!.env.example
+.mcp.json
+.mcp.*.json
+.agents/
+.codex/
+.claude/
+.ssh/
+.aws/
+secrets/
+credentials/
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+skills-lock.json
+supabase/.temp/
+supabase/.branches/
+
+# Private financial source records, exports, import scripts, and handoffs
+/historical-records/
+/scripts/
+*.csv
+*.csv.*
+/current-state.md
+/project-overview.md
+/README.md
+
+# These local demo fixtures contain financial examples, not synthetic data.
+# Keep their route and dependent tests local until sanitized replacements exist.
+/lib/demo.ts
+/app/demo/
+/tests/database.test.ts
+/tests/history.test.ts
+/tests/ledger.test.ts
+/tests/receipt-import.test.ts
+/tests/historical-import.test.ts
+/tests/followup-import.test.ts
+/tests/browser/records.spec.ts
+/tests/browser/portal.spec.ts
+
+# Database snapshots and backups (keep schema migrations versionable)
+*.dump
+*.backup
+*.bak
+*.sqlite
+*.sqlite3
+*.db
+/backups/
+/supabase/backups/

@@ -1,0 +1,21 @@
+name: dread-ledger
+region: nyc
+services:
+  - name: web
+    github:
+      repo: REPLACE_OWNER/REPLACE_REPOSITORY
+      branch: main
+      deploy_on_push: true
+    dockerfile_path: Dockerfile
+    http_port: 3000
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    health_check:
+      http_path: /api/health
+    envs:
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        scope: RUN_AND_BUILD_TIME
+        value: https://vihzczjouvcvkeaqmijp.supabase.co
+      - key: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+        scope: RUN_AND_BUILD_TIME
+        value: REPLACE_WITH_PUBLISHABLE_KEY
