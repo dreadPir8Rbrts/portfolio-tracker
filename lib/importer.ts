@@ -63,7 +63,8 @@ function person(s: string): PersonId {
       dread: "dread",
       "1of1": "1of1",
       michael: "1of1",
-      max: "max",
+      max: "mrbodoia",
+      mrbodoia: "mrbodoia",
       matthew: "chang",
       chang: "chang",
       "pokemon hooper": "pokemonhooper",
@@ -93,7 +94,7 @@ export function previewImport(
   const names = {
     dread: "Joey",
     "1of1": "1of1",
-    max: "Max",
+    mrbodoia: "Max",
     chang: "Matthew",
     pokemonhooper: "Pokemon Hooper",
   };
@@ -107,7 +108,7 @@ export function previewImport(
               r[
                 p === "dread"
                   ? "Joey Ownership %"
-                  : p === "max"
+                  : p === "mrbodoia"
                     ? "Max Ownership %"
                     : names[p] + " %"
               ] || 0,

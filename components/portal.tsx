@@ -50,7 +50,7 @@ function exportCsv(rows: unknown[][]) {
   });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "dread-ledger-statement.csv";
+  a.download = "ninjadex-ledger-statement.csv";
   a.click();
   URL.revokeObjectURL(a.href);
 }
@@ -130,7 +130,7 @@ export default function Portal({
   if (!data)
     return (
       <main className="loading">
-        <span className="brand">◈ DREAD LEDGER</span>
+        <span className="brand">◈ NINJADEX LEDGER</span>
         <h1>{error ? "Account setup needed" : "Opening your portfolio…"}</h1>
         {error && (
           <>
@@ -423,7 +423,7 @@ export default function Portal({
         <a className="brand" href={demo ? "/demo" : "/"}>
           <span className="brand-mark">◈</span>
           <span>
-            DREAD<span className="brand-sub">LEDGER</span>
+            NINJADEX<span className="brand-sub">LEDGER</span>
           </span>
         </a>
         <div className="workspace">
@@ -885,10 +885,10 @@ export default function Portal({
                               style={{
                                 flex: s.cost,
                                 background: [
-                                  "#b6c9ac",
-                                  "#40574b",
-                                  "#d3bb85",
-                                  "#879b91",
+                                  "var(--chart-1)",
+                                  "var(--chart-2)",
+                                  "var(--chart-3)",
+                                  "var(--chart-4)",
                                 ][i % 4],
                               }}
                               title={d.name}
@@ -901,10 +901,10 @@ export default function Portal({
                               <span
                                 style={{
                                   background: [
-                                    "#b6c9ac",
-                                    "#40574b",
-                                    "#d3bb85",
-                                    "#879b91",
+                                    "var(--chart-1)",
+                                    "var(--chart-2)",
+                                    "var(--chart-3)",
+                                    "var(--chart-4)",
                                   ][i % 4],
                                 }}
                               />
@@ -1016,7 +1016,8 @@ export default function Portal({
                       <span className={"avatar large " + p}>
                         {people[p][0]}
                       </span>
-                      <h2>{people[p]}</h2>
+                      <h2>{p}</h2>
+                      <p className="partner-name">{people[p]}</p>
                       <span className="tag">
                         {p === data.person && data.admin
                           ? "Administrator"
@@ -1048,7 +1049,7 @@ export default function Portal({
             </>
           )}
           <footer>
-            ◈ Dread Ledger <span>Shared ownership. Clear records.</span>
+            ◈ Ninjadex Ledger <span>Shared ownership. Clear records.</span>
           </footer>
         </main>
       </div>

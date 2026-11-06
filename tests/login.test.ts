@@ -88,7 +88,7 @@ test("changed account links fail closed; lookup failures do not leak details", a
   const responses = [
     { email: "private@example.com" },
     { access_token: "access", refresh_token: "refresh" },
-    { person: "max" },
+    { person: "mrbodoia" },
   ];
   assert.equal(
     (

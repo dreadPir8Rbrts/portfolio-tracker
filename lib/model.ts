@@ -1,10 +1,16 @@
 import { z } from "zod";
-export const ids = ["dread", "1of1", "max", "chang", "pokemonhooper"] as const;
+export const ids = [
+  "dread",
+  "1of1",
+  "mrbodoia",
+  "chang",
+  "pokemonhooper",
+] as const;
 export type PersonId = (typeof ids)[number];
 export const people: Record<PersonId, string> = {
   dread: "Joey",
   "1of1": "Michael",
-  max: "Max",
+  mrbodoia: "Max",
   chang: "Matthew",
   pokemonhooper: "Seb",
 };

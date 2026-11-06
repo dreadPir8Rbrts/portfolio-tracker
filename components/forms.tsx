@@ -243,7 +243,7 @@ export function DealForm({
               margin: "16px 0",
               padding: 16,
               minWidth: 0,
-              border: "1px solid var(--line, #d6ddd6)",
+              border: "1px solid var(--line)",
               borderRadius: 8,
             }}
           >

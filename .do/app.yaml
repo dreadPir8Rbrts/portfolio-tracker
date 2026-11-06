@@ -1,4 +1,4 @@
-name: dread-ledger
+name: ninjadex-ledger
 region: nyc
 services:
   - name: web

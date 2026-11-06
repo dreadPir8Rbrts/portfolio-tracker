@@ -7,7 +7,7 @@ export default function Login() {
   return (
     <main className="login">
       <div className="login-art">
-        <span className="brand">◈ DREAD LEDGER</span>
+        <span className="brand">◈ NINJADEX LEDGER</span>
         <h1>
           Your collection.
           <br />
@@ -16,7 +16,7 @@ export default function Login() {
         <p>A shared home for cards, capital, and clear balances.</p>
         <div className="card-stack">
           <div>
-            DL
+            NL
             <span>
               COLLECTIVE
               <br />

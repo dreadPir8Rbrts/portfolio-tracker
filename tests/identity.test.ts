@@ -11,7 +11,10 @@ test("identity migration preserves payloads and securely links logins to people"
     const files = readdirSync("supabase/migrations")
       .filter((f) => f.endsWith(".sql"))
       .sort();
-    for (const f of files.slice(0, -1))
+    const identityIndex = files.findIndex((f) =>
+      f.endsWith("_people_auth_identity.sql"),
+    );
+    for (const f of files.slice(0, identityIndex))
       await db.exec(readFileSync("supabase/migrations/" + f, "utf8"));
     const uid = "30000000-0000-4000-8000-000000000001";
     await db.query<any>("insert into auth.users values($1,$2)", [
@@ -24,7 +27,18 @@ test("identity migration preserves payloads and securely links logins to people"
     await db.query<any>("select set_config('request.jwt.claim.sub',$1,false)", [
       uid,
     ]);
-    await db.exec(readFileSync("supabase/migrations/" + files.at(-1), "utf8"));
+    for (const f of files.slice(identityIndex)) {
+      if (f.endsWith("_rename_max_to_mrbodoia.sql")) {
+        await db.query("insert into auth.users values($1,$2)", [
+          "30000000-0000-4000-8000-000000000002",
+          "max@example.com",
+        ]);
+        await db.exec(
+          "update public.people set auth_user_id='30000000-0000-4000-8000-000000000002' where id='max'",
+        );
+      }
+      await db.exec(readFileSync("supabase/migrations/" + f, "utf8"));
+    }
     await db.exec("set role authenticated");
     assert.deepEqual(
       (await db.query<any>("select public.my_identity() as i")).rows[0].i,
@@ -35,7 +49,7 @@ test("identity migration preserves payloads and securely links logins to people"
       5,
     );
     await assert.rejects(
-      db.exec("update public.people set admin=true where id='max'"),
+      db.exec("update public.people set admin=true where id='mrbodoia'"),
     );
     await assert.rejects(db.exec("select auth_user_id from public.people"));
     await assert.rejects(db.exec("select public.resolve_login('dread')"));
@@ -43,6 +57,24 @@ test("identity migration preserves payloads and securely links logins to people"
     await assert.rejects(db.exec("select * from public.people"));
     await assert.rejects(db.exec("select public.resolve_login('dread')"));
     await db.exec("reset role;set role service_role");
+    assert.deepEqual(
+      (await db.query<any>("select public.resolve_login('mrbodoia') as r"))
+        .rows[0].r,
+      { email: "max@example.com", limited: false },
+    );
+    assert.deepEqual(
+      (await db.query<any>("select public.resolve_login('max') as r")).rows[0]
+        .r,
+      { email: null, limited: false },
+    );
+    assert.deepEqual(
+      (
+        await db.query<any>(
+          "select id,name,admin from public.people where id='mrbodoia'",
+        )
+      ).rows[0],
+      { id: "mrbodoia", name: "Max", admin: false },
+    );
     for (let i = 0; i < 10; i++)
       assert.deepEqual(
         (await db.query<any>("select public.resolve_login(' DREAD ') as r"))
