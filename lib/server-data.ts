@@ -14,7 +14,7 @@ export async function readData() {
     );
   if (!identity.data?.person)
     throw new Error(
-      "Your login has not been linked to a partner. Contact Joey.",
+      "Your login has not been linked to a partner. Contact the administrator.",
     );
   // Paginate explicitly: Supabase limits each response to 1,000 rows by default.
   async function all(table: string, order: string, structured = false) {

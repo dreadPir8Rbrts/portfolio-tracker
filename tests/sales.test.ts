@@ -16,7 +16,7 @@ const deal = dealSchema.parse({
   items: "Two cards",
   notes: "",
   members: [
-    { person: "joey", weight: 1, funded: 3100000 },
+    { person: "dread", weight: 1, funded: 3100000 },
     { person: "1of1", weight: 1, funded: 0 },
   ],
   inventory: [first, second].map((id) => ({
@@ -35,7 +35,7 @@ const entry = (patch: Partial<Entry> = {}) =>
     date: "2026-10-22",
     amount: 2000000,
     fees: 0,
-    from: "joey",
+    from: "dread",
     to: null,
     notes: "Card sale",
     close: false,
@@ -52,7 +52,7 @@ test("sale-date profit is independent of installments and deal closure", () => {
   assert.equal(then.profit, 1450000);
   assert.equal(then.received, 2000000);
   assert.equal(then.owed, 1000000);
-  assert.equal(then.shares.joey, 725000);
+  assert.equal(then.shares.dread, 725000);
   assert.equal(then.shares["1of1"], 725000);
   const now = salePerformance(deal, history);
   assert.equal(now.profit, 1450000);
@@ -192,7 +192,7 @@ test("internal credit transfers do not pretend unallocated partner payments are 
     saleTerms: undefined,
     amount: 3000000,
     acquisitionId: crypto.randomUUID(),
-    to: "matthew" as const,
+    to: "chang" as const,
   };
   const result = salePerformance(deal, [transfer]);
   assert.equal(result.profit, 1450000);

@@ -1,0 +1,4 @@
+[functions.username-login]
+# Public password-login endpoint: the handler performs authentication itself.
+verify_jwt = false
+entrypoint = "./functions/username-login/index.ts"

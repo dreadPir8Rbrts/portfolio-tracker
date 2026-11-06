@@ -27,7 +27,7 @@ export function DealForm({
 }: {
   save: (d: DealCreation) => Promise<void>;
 }) {
-  const [selected, setSelected] = useState<PersonId[]>(["joey", "1of1"]),
+  const [selected, setSelected] = useState<PersonId[]>(["dread", "1of1"]),
     [equal, setEqual] = useState(true),
     [purchasePrice, setPurchasePrice] = useState(""),
     [costs, setCosts] = useState<

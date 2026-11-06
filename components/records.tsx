@@ -31,7 +31,7 @@ export default function Records({
     [parent, setParent] = useState(""),
     [csv, setCsv] = useState(""),
     [filename, setFilename] = useState(""),
-    [collector, setCollector] = useState<PersonId>("joey"),
+    [collector, setCollector] = useState<PersonId>("dread"),
     [preview, setPreview] = useState<ImportPreview | null>(null);
   const inventory: Inventory[] =
     data.inventory ??

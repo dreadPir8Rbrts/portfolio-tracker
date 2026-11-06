@@ -1,12 +1,12 @@
 import { z } from "zod";
-export const ids = ["joey", "1of1", "max", "matthew", "hooper"] as const;
+export const ids = ["dread", "1of1", "max", "chang", "pokemonhooper"] as const;
 export type PersonId = (typeof ids)[number];
 export const people: Record<PersonId, string> = {
-  joey: "Joey · Dread",
-  "1of1": "1of1",
+  dread: "Joey",
+  "1of1": "Michael",
   max: "Max",
-  matthew: "Matthew",
-  hooper: "Pokemon Hooper",
+  chang: "Matthew",
+  pokemonhooper: "Seb",
 };
 const person = z.enum(ids);
 export const cents = z.number().int().min(0).max(100_000_000_000);

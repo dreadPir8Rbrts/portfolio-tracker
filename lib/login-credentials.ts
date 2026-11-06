@@ -4,25 +4,8 @@ export const loginSchema = z.object({
     .string()
     .trim()
     .min(1)
-    .max(254)
-    .transform((v) => v.toLowerCase()),
+    .max(64)
+    .transform((v) => v.toLowerCase())
+    .pipe(z.string().regex(/^[a-z0-9][a-z0-9_-]{0,63}$/)),
   password: z.string().min(1).max(1024),
 });
-// Server configuration only. Never expose the directory through an API or NEXT_PUBLIC env.
-export function loginEmail(
-  username: string,
-  configuration: string | undefined,
-): string | null {
-  const parsed = z
-    .record(z.string(), z.string().email())
-    .safeParse(JSON.parse(configuration || "{}"));
-  if (!parsed.success) throw new Error("Invalid login configuration");
-  const key = username.trim().toLowerCase();
-  const directory = new Map(
-    Object.entries(parsed.data).map(([name, email]) => [
-      name.toLowerCase(),
-      email,
-    ]),
-  );
-  return directory.get(key) ?? null;
-}

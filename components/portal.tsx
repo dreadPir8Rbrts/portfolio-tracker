@@ -63,7 +63,7 @@ export default function Portal({
 }) {
   const [data, setData] = useState<Data | null>(initialData ?? null),
     [tab, setTab] = useState<Tab>("overview"),
-    [view, setView] = useState<PersonId>("joey"),
+    [view, setView] = useState<PersonId>("dread"),
     [search, setSearch] = useState(""),
     [selected, setSelected] = useState<string | null>(null),
     [modal, setModal] = useState<"deal" | "entry" | null>(null),
@@ -460,7 +460,7 @@ export default function Portal({
             <p>Ownership, funding, and payments in one place.</p>
           </div>
           <div className="user">
-            <span className="avatar joey">{people[data.person][0]}</span>
+            <span className="avatar dread">{people[data.person][0]}</span>
             <div>
               {people[data.person]}
               <small>{admin ? "Admin" : "Partner"}</small>
@@ -1018,7 +1018,7 @@ export default function Portal({
                       </span>
                       <h2>{people[p]}</h2>
                       <span className="tag">
-                        {p === "joey"
+                        {p === data.person && data.admin
                           ? "Administrator"
                           : p === "1of1"
                             ? "Main partner"

@@ -42,7 +42,7 @@ test("successful password login opens the dashboard", async ({ page }) => {
     }),
   );
   await page.goto("/login");
-  await page.getByLabel("Username", { exact: true }).fill("joey");
+  await page.getByLabel("Username", { exact: true }).fill("dread");
   await page.getByLabel("Password", { exact: true }).fill("test-password-only");
   await page.getByRole("button", { name: "Sign in →", exact: true }).click();
   await expect(

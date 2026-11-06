@@ -29,5 +29,11 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "supabase/functions",
+    "scripts",
+    "tests/historical-import.test.ts",
+    "tests/followup-import.test.ts"
+  ]
 }

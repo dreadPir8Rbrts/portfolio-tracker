@@ -15,7 +15,7 @@ const input = () => {
     notes: "",
     items: "Cards",
     members: [
-      { person: "joey", weight: 1, funded: 2500000 },
+      { person: "dread", weight: 1, funded: 2500000 },
       { person: "1of1", weight: 1, funded: 0 },
     ],
     expenses: [
@@ -25,7 +25,7 @@ const input = () => {
         kind: "expense",
         date: "2026-10-29",
         amount: 50000,
-        from: "joey",
+        from: "dread",
         to: null,
         notes: "Flights",
       },
@@ -48,7 +48,7 @@ test("new-deal expenses use ownership by default, custom splits, and their actua
   const state = project(deal, entries);
   assert.equal(deal.cost, 2500000);
   assert.equal(state.cost, 2570000);
-  assert.equal(state.positions.joey, 1275000);
+  assert.equal(state.positions.dread, 1275000);
   assert.equal(state.positions["1of1"], -1275000);
   assert.equal(state.costShares["1of1"], 1295000);
   assert.equal(entries.length, 2);
@@ -67,7 +67,7 @@ test("new-deal expenses reject wrong deals, types, duplicate IDs and invalid all
   c.expenses[1].id = c.expenses[0].id;
   assert.throws(() => prepareDealCreation(c, [], []), /already recorded/);
   const d = input();
-  d.expenses[1].allocations = [{ person: "matthew", weight: 1 }];
+  d.expenses[1].allocations = [{ person: "chang", weight: 1 }];
   assert.throws(() => prepareDealCreation(d, [], []), /participants/);
   const e = input();
   e.expenses[0].notes = " ";

@@ -59,13 +59,17 @@ function person(s: string): PersonId {
   const key = s.toLowerCase().trim();
   const p = (
     {
-      joey: "joey",
-      dread: "joey",
+      joey: "dread",
+      dread: "dread",
       "1of1": "1of1",
+      michael: "1of1",
       max: "max",
-      matthew: "matthew",
-      "pokemon hooper": "hooper",
-      hooper: "hooper",
+      matthew: "chang",
+      chang: "chang",
+      "pokemon hooper": "pokemonhooper",
+      hooper: "pokemonhooper",
+      pokemonhooper: "pokemonhooper",
+      seb: "pokemonhooper",
     } as Record<string, PersonId>
   )[key];
   if (!p) throw new Error(`Unknown person: ${s}`);
@@ -87,11 +91,11 @@ export function previewImport(
     events: Entry[] = [],
     warnings: string[] = [];
   const names = {
-    joey: "Joey",
+    dread: "Joey",
     "1of1": "1of1",
     max: "Max",
-    matthew: "Matthew",
-    hooper: "Pokemon Hooper",
+    chang: "Matthew",
+    pokemonhooper: "Pokemon Hooper",
   };
   for (const [i, r] of rows.entries()) {
     try {
@@ -101,7 +105,7 @@ export function previewImport(
             person: p,
             weight: Number(
               r[
-                p === "joey"
+                p === "dread"
                   ? "Joey Ownership %"
                   : p === "max"
                     ? "Max Ownership %"
