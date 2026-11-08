@@ -1214,3 +1214,115 @@ dialog::backdrop {
     padding: 40px 25px;
   }
 }
+.balance-button {
+  width: 100%;
+  color: var(--ink);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+}
+.balance-button:hover {
+  background: var(--surface-raised);
+}
+.balance-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.balance-button .amount {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.statement-total {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.balance-statement table {
+  width: 100%;
+}
+.balance-statement td {
+  vertical-align: top;
+}
+.balance-statement td p {
+  margin: 6px 0;
+  max-width: 52ch;
+  white-space: normal;
+}
+.statement-date,
+.statement-money {
+  white-space: nowrap;
+}
+.statement-money,
+.statement-running {
+  font-variant-numeric: tabular-nums;
+}
+.statement-running {
+  min-width: 190px;
+  white-space: normal;
+}
+.statement-deal {
+  display: block;
+  margin: 8px 0;
+  text-align: left;
+  white-space: normal;
+}
+.balance-statement summary {
+  cursor: pointer;
+  color: var(--muted);
+  margin-top: 10px;
+}
+.balance-statement .statement-note {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.balance-statement tfoot {
+  background: var(--surface-raised);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 700px) {
+  .balance-statement thead {
+    display: none;
+  }
+  .balance-statement table,
+  .balance-statement tbody,
+  .balance-statement tfoot {
+    display: block;
+  }
+  .balance-statement tr {
+    display: block;
+    padding: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .balance-statement td,
+  .balance-statement tfoot th {
+    display: block;
+    padding: 5px 0;
+    border: 0;
+    min-width: 0;
+    white-space: normal;
+  }
+  .balance-statement td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 7px;
+    margin-bottom: 3px;
+  }
+  .balance-statement .statement-date {
+    color: var(--muted);
+  }
+}

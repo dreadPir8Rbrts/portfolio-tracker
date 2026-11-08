@@ -30,6 +30,7 @@ import {
 import { salePerformance } from "@/lib/sales";
 import { DealForm, EntryForm } from "./forms";
 import Records from "./records";
+import BalanceStatement from "./balance-statement";
 import { browserClient } from "@/lib/browser";
 type Tab =
   "overview" | "personal" | "deals" | "activity" | "people" | "records";
@@ -66,6 +67,10 @@ export default function Portal({
     [view, setView] = useState<PersonId>("dread"),
     [search, setSearch] = useState(""),
     [selected, setSelected] = useState<string | null>(null),
+    [statement, setStatement] = useState<{
+      person: PersonId;
+      partner: PersonId;
+    } | null>(null),
     [modal, setModal] = useState<"deal" | "entry" | null>(null),
     [error, setError] = useState(""),
     [notice, setNotice] = useState("");
@@ -442,6 +447,7 @@ export default function Portal({
               className={tab === n.id ? "nav-item active" : "nav-item"}
               onClick={() => {
                 setTab(n.id);
+                setStatement(null);
                 setSelected(null);
               }}
             >
@@ -534,17 +540,19 @@ export default function Portal({
               <h1>
                 {selected
                   ? chosen?.name
-                  : tab === "records"
-                    ? "Records & reconciliation"
-                    : tab === "overview"
-                      ? "Portfolio overview"
-                      : tab === "personal"
-                        ? "My dashboard"
-                        : tab === "deals"
-                          ? "Deals & inventory"
-                          : tab === "people"
-                            ? "Your partners"
-                            : "Transactions"}
+                  : statement
+                    ? "Balance breakdown"
+                    : tab === "records"
+                      ? "Records & reconciliation"
+                      : tab === "overview"
+                        ? "Portfolio overview"
+                        : tab === "personal"
+                          ? "My dashboard"
+                          : tab === "deals"
+                            ? "Deals & inventory"
+                            : tab === "people"
+                              ? "Your partners"
+                              : "Transactions"}
               </h1>
               <p>
                 {selected
@@ -561,10 +569,12 @@ export default function Portal({
               </p>
             </div>
             <div className="heading-actions">
-              <button className="secondary" onClick={exportStatement}>
-                <Download size={16} />
-                Export
-              </button>
+              {(!statement || selected) && (
+                <button className="secondary" onClick={exportStatement}>
+                  <Download size={16} />
+                  Export
+                </button>
+              )}
               {admin && (
                 <>
                   <button
@@ -581,13 +591,21 @@ export default function Portal({
               )}
             </div>
           </div>
-          {selected && chosen && chosenState && chosenSales ? (
+          {statement && !selected ? (
+            <BalanceStatement
+              data={data}
+              person={statement.person}
+              partner={statement.partner}
+              onBack={() => setStatement(null)}
+              onDeal={setSelected}
+            />
+          ) : selected && chosen && chosenState && chosenSales ? (
             <>
               <button
                 className="text-button back"
                 onClick={() => setSelected(null)}
               >
-                ← Back to portfolio
+                ← Back to {statement ? "balance breakdown" : "portfolio"}
               </button>
               <div className="stats">
                 <Stat
@@ -922,19 +940,41 @@ export default function Portal({
                           <h2>
                             {personal ? "My balances" : "Partner balances"}
                           </h2>
-                          <p>Who owes whom, after offsets.</p>
+                          <p>
+                            Who owes whom, after offsets. Select a balance to
+                            see its history.
+                          </p>
                         </div>
                         <ArrowLeftRight size={19} />
                       </div>
                       <div className="panel-body">
                         {edges.map((e, i) => (
-                          <div className="balance-line" key={i}>
+                          <button
+                            type="button"
+                            className="balance-line balance-button"
+                            key={i}
+                            aria-label={`View breakdown: ${people[e.from]} owes ${people[e.to]} ${money(e.amount)}`}
+                            onClick={() =>
+                              setStatement({
+                                person: personal ? view : e.from,
+                                partner:
+                                  personal && e.from === view
+                                    ? e.to
+                                    : personal
+                                      ? e.from
+                                      : e.to,
+                              })
+                            }
+                          >
                             <div>
                               <strong>{people[e.from]}</strong>
                               <small>owes {people[e.to]}</small>
                             </div>
-                            <span className="amount">{money(e.amount)}</span>
-                          </div>
+                            <span className="amount">
+                              {money(e.amount)}{" "}
+                              <ChevronRight size={16} aria-hidden="true" />
+                            </span>
+                          </button>
                         ))}
                         {!edges.length && (
                           <div className="empty compact">
