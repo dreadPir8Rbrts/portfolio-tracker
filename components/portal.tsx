@@ -32,6 +32,8 @@ import { collectedProceeds } from "@/lib/collected-proceeds";
 import { DealForm, EntryForm } from "./forms";
 import Records from "./records";
 import BalanceStatement from "./balance-statement";
+import MetricBreakdown from "./metric-breakdown";
+import { MetricKind } from "@/lib/metric-breakdown";
 import EbayPayouts from "./ebay-payouts";
 import { sourceCategories } from "@/lib/ebay-payouts";
 import { browserClient } from "@/lib/browser";
@@ -70,6 +72,10 @@ export default function Portal({
     [view, setView] = useState<PersonId>("dread"),
     [search, setSearch] = useState(""),
     [selected, setSelected] = useState<string | null>(null),
+    [metric, setMetric] = useState<{
+      kind: MetricKind;
+      person?: PersonId;
+    } | null>(null),
     [statement, setStatement] = useState<{
       person: PersonId;
       partner: PersonId;
@@ -455,6 +461,7 @@ export default function Portal({
               onClick={() => {
                 setTab(n.id);
                 setStatement(null);
+                setMetric(null);
                 setSelected(null);
               }}
             >
@@ -547,19 +554,23 @@ export default function Portal({
               <h1>
                 {selected
                   ? chosen?.name
-                  : statement
-                    ? "Balance breakdown"
-                    : tab === "records"
-                      ? "Records & reconciliation"
-                      : tab === "overview"
-                        ? "Portfolio overview"
-                        : tab === "personal"
-                          ? "My dashboard"
-                          : tab === "deals"
-                            ? "Deals & inventory"
-                            : tab === "people"
-                              ? "Your partners"
-                              : "Transactions"}
+                  : metric
+                    ? metric.kind === "proceeds"
+                      ? "Net sale proceeds breakdown"
+                      : "Realized profit / loss breakdown"
+                    : statement
+                      ? "Balance breakdown"
+                      : tab === "records"
+                        ? "Records & reconciliation"
+                        : tab === "overview"
+                          ? "Portfolio overview"
+                          : tab === "personal"
+                            ? "My dashboard"
+                            : tab === "deals"
+                              ? "Deals & inventory"
+                              : tab === "people"
+                                ? "Your partners"
+                                : "Transactions"}
               </h1>
               <p>
                 {selected
@@ -576,7 +587,7 @@ export default function Portal({
               </p>
             </div>
             <div className="heading-actions">
-              {(!statement || selected) && (
+              {((!statement && !metric) || selected) && (
                 <button className="secondary" onClick={exportStatement}>
                   <Download size={16} />
                   Export
@@ -598,7 +609,15 @@ export default function Portal({
               )}
             </div>
           </div>
-          {statement && !selected ? (
+          {metric && !selected ? (
+            <MetricBreakdown
+              data={data}
+              kind={metric.kind}
+              person={metric.person}
+              onBack={() => setMetric(null)}
+              onDeal={setSelected}
+            />
+          ) : statement && !selected ? (
             <BalanceStatement
               data={data}
               person={statement.person}
@@ -612,7 +631,12 @@ export default function Portal({
                 className="text-button back"
                 onClick={() => setSelected(null)}
               >
-                ← Back to {statement ? "balance breakdown" : "portfolio"}
+                ← Back to{" "}
+                {metric
+                  ? "metric breakdown"
+                  : statement
+                    ? "balance breakdown"
+                    : "portfolio"}
               </button>
               <div className="stats">
                 <Stat
@@ -880,6 +904,9 @@ export default function Portal({
                     {personal && (
                       <Stat
                         label="My net sale proceeds"
+                        onClick={() =>
+                          setMetric({ kind: "proceeds", person: view })
+                        }
                         value={money(receivedProceeds.shares[view])}
                         caption="Your share of collected sales, after recorded fees"
                         icon={<ArrowDownLeft size={18} />}
@@ -887,6 +914,12 @@ export default function Portal({
                     )}
                     <Stat
                       label="Realized profit / loss"
+                      onClick={() =>
+                        setMetric({
+                          kind: "profit",
+                          person: personal ? view : undefined,
+                        })
+                      }
                       value={money(profit)}
                       caption={
                         incomplete
@@ -1161,21 +1194,38 @@ function Stat({
   caption,
   accent,
   icon,
+  onClick,
 }: {
   label: string;
   value: string;
   caption: string;
   accent?: boolean;
   icon?: React.ReactNode;
+  onClick?: () => void;
 }) {
-  return (
-    <section className={"stat " + (accent ? "accent" : "")}>
-      <div>
+  const content = (
+    <>
+      <span className="stat-label">
         {label}
         {icon}
-      </div>
+      </span>
       <strong>{value}</strong>
       <small>{caption}</small>
-    </section>
+      {onClick && <span className="stat-action">View breakdown →</span>}
+    </>
+  );
+  const className =
+    "stat " + (accent ? "accent " : "") + (onClick ? "stat-button" : "");
+  return onClick ? (
+    <button
+      type="button"
+      className={className}
+      onClick={onClick}
+      aria-label={`View breakdown: ${label}, ${value}`}
+    >
+      {content}
+    </button>
+  ) : (
+    <section className={className}>{content}</section>
   );
 }

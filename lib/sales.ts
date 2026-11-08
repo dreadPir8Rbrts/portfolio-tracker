@@ -91,6 +91,10 @@ export type SaleResult = {
   owed: number | null;
   fees: number;
   cost: number | null;
+  purchaseCost: number | null;
+  expenseCost: number | null;
+  receiptIds: string[];
+  expenses: { id: string; amount: number; shares: ReturnType<typeof zero> }[];
   profit: number | null;
   shares: ReturnType<typeof zero>;
 };
@@ -180,9 +184,15 @@ export function salePerformance(
           quantity: i.quantity - (used.get(i.id) ?? 0),
         }))
         .filter((i) => i.quantity > 0);
+    let purchaseCost = 0,
+      expenseCost = 0;
     let cost = 0,
       known = lines.length > 0;
     const offset = zero();
+    const allocatedExpenses = new Map<
+      string,
+      { id: string; amount: number; shares: ReturnType<typeof zero> }
+    >();
     const names: string[] = [];
     for (const line of lines) {
       const index = items.findIndex((i) => i.id === line.itemId);
@@ -203,6 +213,7 @@ export function salePerformance(
             (BigInt(Math.abs(n)) * BigInt(before)) / BigInt(item.quantity),
           ));
       cost += portion(item.cost);
+      purchaseCost += portion(item.cost);
       for (const { entry: expense, costs } of expenseParts) {
         const prefix = costs.slice(0, index).reduce((n, c) => n + c, 0);
         const start =
@@ -216,6 +227,7 @@ export function salePerformance(
             (BigInt(costs[index]) * BigInt(after)) / BigInt(item.quantity),
           );
         cost += end - start;
+        expenseCost += end - start;
         const standardStart = allocate(start, deal.members),
           standardEnd = allocate(end, deal.members);
         const customStart = allocate(
@@ -223,6 +235,15 @@ export function salePerformance(
             expense.allocations ?? deal.members,
           ),
           customEnd = allocate(end, expense.allocations ?? deal.members);
+        const allocated = allocatedExpenses.get(expense.id) ?? {
+          id: expense.id,
+          amount: 0,
+          shares: zero(),
+        };
+        allocated.amount += end - start;
+        for (const p of ids)
+          allocated.shares[p] += customEnd[p] - customStart[p];
+        allocatedExpenses.set(expense.id, allocated);
         for (const p of ids)
           offset[p] +=
             standardEnd[p] - standardStart[p] - customEnd[p] + customStart[p];
@@ -248,6 +269,12 @@ export function salePerformance(
       owed: g.total === null || received === null ? null : g.total - received,
       fees: g.fees,
       cost: known ? cost : null,
+      purchaseCost: known ? purchaseCost : null,
+      expenseCost: known ? expenseCost : null,
+      receiptIds: g.receipts.map((e) => e.id),
+      expenses: known
+        ? [...allocatedExpenses.values()].filter((e) => e.amount !== 0)
+        : [],
       profit,
       shares,
     });
