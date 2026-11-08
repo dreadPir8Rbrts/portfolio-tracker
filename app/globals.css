@@ -388,6 +388,11 @@ input[type="checkbox"] {
   gap: 16px;
   margin: 0 0 26px;
 }
+@media (min-width: 851px) {
+  .stats.personal-stats {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+}
 .stat {
   padding: 22px 20px;
   background: var(--surface);

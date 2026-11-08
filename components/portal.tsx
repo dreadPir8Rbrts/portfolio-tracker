@@ -28,6 +28,7 @@ import {
   prepareEntry,
 } from "@/lib/ledger";
 import { salePerformance } from "@/lib/sales";
+import { collectedProceeds } from "@/lib/collected-proceeds";
 import { DealForm, EntryForm } from "./forms";
 import Records from "./records";
 import BalanceStatement from "./balance-statement";
@@ -179,6 +180,7 @@ export default function Portal({
     0,
   );
   const incomplete = performance.reduce((n, p) => n + p.incomplete, 0);
+  const receivedProceeds = collectedProceeds(visibleDeals, data.events);
   const chosen = data.deals.find((d) => d.id === selected),
     chosenState = chosen ? project(chosen, data.events) : null;
   const chosenSales = chosen
@@ -838,7 +840,7 @@ export default function Portal({
                       </select>
                     </label>
                   )}
-                  <div className="stats">
+                  <div className={personal ? "stats personal-stats" : "stats"}>
                     <Stat
                       label={
                         personal
@@ -875,6 +877,14 @@ export default function Portal({
                       }
                       icon={<ArrowUpRight size={18} />}
                     />
+                    {personal && (
+                      <Stat
+                        label="My net sale proceeds"
+                        value={money(receivedProceeds.shares[view])}
+                        caption="Your share of collected sales, after recorded fees"
+                        icon={<ArrowDownLeft size={18} />}
+                      />
+                    )}
                     <Stat
                       label="Realized profit / loss"
                       value={money(profit)}
