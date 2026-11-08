@@ -1326,3 +1326,77 @@ dialog::backdrop {
     color: var(--muted);
   }
 }
+.payout-filters {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.payout-filters label {
+  min-width: 180px;
+}
+.payout-totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+.payout-totals > div {
+  padding: 16px;
+  background: var(--surface-raised);
+  border-radius: 10px;
+}
+.payout-totals span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+.payout-totals strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+.payout-list {
+  margin-top: 24px;
+}
+.payout-row {
+  border-top: 1px solid var(--line);
+}
+.payout-row summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+  padding: 18px 0;
+}
+.payout-row summary::after {
+  content: "+";
+  color: var(--accent);
+}
+.payout-row[open] summary::after {
+  content: "−";
+}
+.payout-row summary > span {
+  flex: 1;
+}
+.payout-row small {
+  display: block;
+  color: var(--muted);
+  margin-top: 7px;
+}
+.payout-detail {
+  padding: 0 0 18px;
+  overflow-wrap: anywhere;
+}
+.payout-forward {
+  padding: 12px;
+  margin-top: 12px;
+  background: var(--surface-inset);
+  border-radius: 8px;
+}
+.source-fields {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin: 16px 0;
+}

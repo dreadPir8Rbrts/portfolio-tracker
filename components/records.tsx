@@ -490,6 +490,15 @@ export default function Records({
               receipt is part of the sale total; do not also import a separate
               full-sale amount.
             </p>
+            <p>
+              To classify eBay transactions, add <code>Source</code> (ebay) and{" "}
+              <code>Source_category</code> (shared_payout, personal_payout,
+              pass_through, refund, purchase, or forwarded). Forwarded payments
+              require <code>Payout_entry_id</code>, the existing incoming
+              pass-through entry ID. Optional <code>Payout_group</code> groups
+              incoming allocations of one deposit. Notes alone do not classify a
+              payout.
+            </p>
             <label>
               CSV file
               <input

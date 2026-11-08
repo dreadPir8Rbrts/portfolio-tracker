@@ -14,6 +14,7 @@ import {
 } from "@/lib/model";
 import { type DealCreation } from "@/lib/deal-creation";
 import { kindNames } from "@/lib/labels";
+import { sourceCategories, sourceOptions } from "@/lib/ebay-payouts";
 import { activeEntries } from "@/lib/ledger";
 const today = () =>
   new Intl.DateTimeFormat("en-CA", {
@@ -401,6 +402,12 @@ export function EntryForm({
     ].includes(kind),
     deal = data.deals.find((d) => d.id === dealId),
     choices = dealKind ? (deal?.members.map((m) => m.person) ?? []) : [...ids];
+  const [source, setSource] = useState("");
+  const [category, setCategory] = useState("");
+  const options = sourceOptions(kind, deal?.members.length ?? 0);
+  const sourceCategory = options.includes(category as never)
+    ? category
+    : options[0];
   const [customExpense, setCustomExpense] = useState(false);
   const [saleMode, setSaleMode] = useState("new");
   const saleOptions = activeEntries(data.events).filter(
@@ -441,6 +448,16 @@ export function EntryForm({
               to: hasTo ? f.get("to") : null,
               notes: f.get("notes"),
               reference: String(f.get("reference") ?? ""),
+              source: source && options.length ? source : undefined,
+              sourceCategory:
+                source && options.length ? sourceCategory : undefined,
+              payoutEntryId:
+                source && sourceCategory === "forwarded"
+                  ? f.get("payoutEntryId")
+                  : undefined,
+              payoutGroup: source
+                ? String(f.get("payoutGroup") ?? "").trim() || undefined
+                : undefined,
               saleTerms:
                 kind === "sale" && saleMode === "new"
                   ? {
@@ -733,6 +750,71 @@ export function EntryForm({
         Receipt / supporting document link (optional)
         <input name="receiptUrl" type="url" placeholder="https://…" />
       </label>
+      {options.length > 0 && (
+        <fieldset className="source-fields">
+          <legend>Transaction source</legend>
+          <label>
+            Source
+            <select
+              aria-label="Transaction source"
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+            >
+              <option value="">Other / unspecified</option>
+              <option value="ebay">eBay</option>
+            </select>
+          </label>
+          {source === "ebay" && (
+            <>
+              <label>
+                eBay category
+                <select
+                  aria-label="eBay category"
+                  value={sourceCategory}
+                  onChange={(e) => setCategory(e.target.value)}
+                >
+                  {options.map((value) => (
+                    <option key={value} value={value}>
+                      {sourceCategories[value]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {sourceCategory === "forwarded" && (
+                <label>
+                  Incoming pass-through payout
+                  <select name="payoutEntryId" required>
+                    <option value="">Choose payout</option>
+                    {activeEntries(data.events)
+                      .filter(
+                        (e) =>
+                          e.source === "ebay" &&
+                          e.sourceCategory === "pass_through",
+                      )
+                      .map((e) => (
+                        <option key={e.id} value={e.id}>
+                          {e.date} · {money(e.amount)} · {e.notes}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+              )}
+              {["shared_payout", "personal_payout", "pass_through"].includes(
+                sourceCategory ?? "",
+              ) && (
+                <label>
+                  Payout grouping reference (optional)
+                  <input
+                    name="payoutGroup"
+                    maxLength={100}
+                    placeholder="Same reference for allocations of one deposit"
+                  />
+                </label>
+              )}
+            </>
+          )}
+        </fieldset>
+      )}
       <label>
         Payment / sale reference (optional)
         <input name="reference" placeholder="PayPal reference, order number…" />

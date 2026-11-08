@@ -31,6 +31,8 @@ import { salePerformance } from "@/lib/sales";
 import { DealForm, EntryForm } from "./forms";
 import Records from "./records";
 import BalanceStatement from "./balance-statement";
+import EbayPayouts from "./ebay-payouts";
+import { sourceCategories } from "@/lib/ebay-payouts";
 import { browserClient } from "@/lib/browser";
 type Tab =
   "overview" | "personal" | "deals" | "activity" | "people" | "records";
@@ -278,6 +280,9 @@ export default function Portal({
                   {reversed.has(e.id) && <span className="tag">Reversed</span>}
                 </strong>
                 <small>{e.notes}</small>
+                {e.source === "ebay" && e.sourceCategory && (
+                  <small>eBay · {sourceCategories[e.sourceCategory]}</small>
+                )}
                 {e.receiptUrl && (
                   <a
                     href={e.receiptUrl}
@@ -991,6 +996,14 @@ export default function Portal({
                     </section>
                   </div>
                 </>
+              )}
+              {tab === "personal" && (
+                <EbayPayouts
+                  key={view}
+                  data={data}
+                  person={view}
+                  onDeal={setSelected}
+                />
               )}
               {(tab === "overview" ||
                 tab === "personal" ||

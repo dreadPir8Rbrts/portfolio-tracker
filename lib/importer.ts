@@ -233,6 +233,10 @@ export function previewImport(
               ? [r.Notes, "Buyer: " + r.Payer].filter(Boolean).join("\n")
               : r.Notes,
           reference: r.Reference || "",
+          source: r.Source || undefined,
+          sourceCategory: r.Source_category || undefined,
+          payoutEntryId: r.Payout_entry_id || undefined,
+          payoutGroup: r.Payout_group || undefined,
           close: type === "sale_receipt" && r.Final === "true",
           target: null,
         });

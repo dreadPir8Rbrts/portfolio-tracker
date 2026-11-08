@@ -248,6 +248,38 @@ export function balances(deals: Deal[], entries: Entry[]): Edge[] {
     });
 }
 export function validateEntry(entry: Entry, deals: Deal[], events: Entry[]) {
+  if (
+    entry.sourceCategory === "shared_payout" ||
+    (entry.sourceCategory === "personal_payout" && entry.kind === "sale")
+  ) {
+    const members =
+      deals.find((d) => d.id === entry.dealId)?.members.length ?? 0;
+    if (
+      !members ||
+      (entry.sourceCategory === "shared_payout" ? members < 2 : members !== 1)
+    )
+      throw new Error("Payout category must match the deal ownership");
+  }
+  if (entry.payoutEntryId) {
+    const active = activeEntries(events);
+    const incoming = active.find((e) => e.id === entry.payoutEntryId);
+    if (
+      !incoming ||
+      incoming.source !== "ebay" ||
+      incoming.sourceCategory !== "pass_through" ||
+      incoming.from !== entry.to ||
+      incoming.to !== entry.from ||
+      incoming.date > entry.date
+    )
+      throw new Error(
+        "Choose an earlier incoming pass-through payout between these partners",
+      );
+    const forwarded = active
+      .filter((e) => e.payoutEntryId === incoming.id)
+      .reduce((sum, e) => sum + e.amount, 0);
+    if (forwarded + entry.amount > incoming.amount)
+      throw new Error("Forwarded payments exceed the incoming payout");
+  }
   validateSales([...events, entry]);
   if (events.some((e) => e.id === entry.id))
     throw new Error("Entry already recorded");

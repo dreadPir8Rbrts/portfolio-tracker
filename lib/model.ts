@@ -154,6 +154,19 @@ export const eventSchema = z
     notes: z.string().trim().min(1).max(5000),
     close: z.boolean().default(false),
     reference: z.string().max(500).optional(),
+    source: z.literal("ebay").optional(),
+    sourceCategory: z
+      .enum([
+        "shared_payout",
+        "personal_payout",
+        "pass_through",
+        "refund",
+        "purchase",
+        "forwarded",
+      ])
+      .optional(),
+    payoutEntryId: z.string().uuid().optional(),
+    payoutGroup: z.string().trim().min(1).max(100).optional(),
     saleTerms: z
       .object({
         total: cents.positive(),
@@ -186,6 +199,29 @@ export const eventSchema = z
   })
   .superRefine((e, c) => {
     const issue = (message: string) => c.addIssue({ code: "custom", message });
+    if (Boolean(e.source) !== Boolean(e.sourceCategory))
+      issue("Choose a source and source category together");
+    if (e.sourceCategory) {
+      const allowed: Record<NonNullable<typeof e.sourceCategory>, string[]> = {
+        shared_payout: ["sale"],
+        personal_payout: ["sale", "payment"],
+        pass_through: ["payment"],
+        refund: ["payment"],
+        purchase: ["purchase_funding", "expense", "on_behalf"],
+        forwarded: ["on_behalf"],
+      };
+      if (!allowed[e.sourceCategory].includes(e.kind))
+        issue("Source category does not match transaction type");
+    }
+    if ((e.sourceCategory === "forwarded") !== Boolean(e.payoutEntryId))
+      issue("Forwarded payments must link to their incoming payout");
+    if (
+      e.payoutGroup &&
+      !["shared_payout", "personal_payout", "pass_through"].includes(
+        e.sourceCategory ?? "",
+      )
+    )
+      issue("Only incoming payouts can have a grouping reference");
     if ((e.saleTerms || e.saleId) && e.kind !== "sale")
       issue("Sale terms and installment links apply only to sales");
     if (e.saleTerms && e.saleId) issue("Choose a new sale or an installment");
