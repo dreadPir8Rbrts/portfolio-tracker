@@ -31,6 +31,8 @@ import { salePerformance } from "@/lib/sales";
 import { collectedProceeds } from "@/lib/collected-proceeds";
 import { DealForm, EntryForm } from "./forms";
 import Records from "./records";
+import GradingPanel from "./grading";
+import { GradingRequest, prepareGrading } from "@/lib/grading";
 import BalanceStatement from "./balance-statement";
 import MetricBreakdown from "./metric-breakdown";
 import { MetricKind } from "@/lib/metric-breakdown";
@@ -38,7 +40,13 @@ import EbayPayouts from "./ebay-payouts";
 import { sourceCategories } from "@/lib/ebay-payouts";
 import { browserClient } from "@/lib/browser";
 type Tab =
-  "overview" | "personal" | "deals" | "activity" | "people" | "records";
+  | "overview"
+  | "personal"
+  | "deals"
+  | "activity"
+  | "people"
+  | "records"
+  | "grading";
 const date = (s: string) =>
   new Date(s + "T12:00:00").toLocaleDateString("en-US", {
     month: "short",
@@ -140,6 +148,34 @@ export default function Portal({
         : "Transaction recorded. Balances updated.",
     );
   }
+  async function saveGrading(request: GradingRequest) {
+    if (!data) return;
+    const prepared = prepareGrading(request, data);
+    if (demo) {
+      setData({
+        ...data,
+        events: prepared.expense
+          ? [...data.events, prepared.expense]
+          : data.events,
+        grading: [
+          ...(data.grading ?? []).filter(
+            (g) => g.id !== prepared.submission.id,
+          ),
+          { ...prepared.submission, version: prepared.expected_version + 1 },
+        ],
+      });
+    } else {
+      const res = await fetch("/api/grading", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(request),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body.error);
+      await refresh();
+    }
+    setNotice("Grading submission saved. Any paid expense is linked once.");
+  }
   const admin = data?.admin ?? false;
   if (!data)
     return (
@@ -206,6 +242,7 @@ export default function Portal({
     { id: "personal" as Tab, label: "My dashboard", icon: Wallet },
     { id: "deals" as Tab, label: "Deals & inventory", icon: Layers },
     { id: "activity" as Tab, label: "Transactions", icon: ArrowLeftRight },
+    { id: "grading" as Tab, label: "Grading", icon: ShieldCheck },
     ...(admin ? [{ id: "people" as Tab, label: "Partners", icon: Users }] : []),
   ];
   const activity = data.events.filter(
@@ -560,30 +597,34 @@ export default function Portal({
                       : "Realized profit / loss breakdown"
                     : statement
                       ? "Balance breakdown"
-                      : tab === "records"
-                        ? "Records & reconciliation"
-                        : tab === "overview"
-                          ? "Portfolio overview"
-                          : tab === "personal"
-                            ? "My dashboard"
-                            : tab === "deals"
-                              ? "Deals & inventory"
-                              : tab === "people"
-                                ? "Your partners"
-                                : "Transactions"}
+                      : tab === "grading"
+                        ? "Grading submissions"
+                        : tab === "records"
+                          ? "Records & reconciliation"
+                          : tab === "overview"
+                            ? "Portfolio overview"
+                            : tab === "personal"
+                              ? "My dashboard"
+                              : tab === "deals"
+                                ? "Deals & inventory"
+                                : tab === "people"
+                                  ? "Your partners"
+                                  : "Transactions"}
               </h1>
               <p>
                 {selected
                   ? "Ownership, funding, and the complete deal history."
-                  : tab === "overview"
-                    ? "A clear picture of your cards, capital, and partnerships."
-                    : tab === "personal"
-                      ? "Your collections, your balances, and where every dollar went."
-                      : tab === "activity"
-                        ? "Every movement of money, with a record you can follow."
-                        : tab === "people"
-                          ? "Shared collections. Individual relationships."
-                          : "From the first purchase to the final payout."}
+                  : tab === "grading"
+                    ? "Submission progress, grades, and grading costs across your deals."
+                    : tab === "overview"
+                      ? "A clear picture of your cards, capital, and partnerships."
+                      : tab === "personal"
+                        ? "Your collections, your balances, and where every dollar went."
+                        : tab === "activity"
+                          ? "Every movement of money, with a record you can follow."
+                          : tab === "people"
+                            ? "Shared collections. Individual relationships."
+                            : "From the first purchase to the final payout."}
               </p>
             </div>
             <div className="heading-actions">
@@ -636,7 +677,9 @@ export default function Portal({
                   ? "metric breakdown"
                   : statement
                     ? "balance breakdown"
-                    : "portfolio"}
+                    : tab === "grading"
+                      ? "grading overview"
+                      : "portfolio"}
               </button>
               <div className="stats">
                 <Stat
@@ -836,6 +879,13 @@ export default function Portal({
                   </div>
                 </section>
               </div>
+              <GradingPanel
+                key={chosen.id}
+                data={data}
+                dealId={chosen.id}
+                onDeal={setSelected}
+                onSave={saveGrading}
+              />
               <section className="panel">
                 <div className="panel-heading">
                   <h2>Deal activity</h2>
@@ -847,6 +897,13 @@ export default function Portal({
             </>
           ) : (
             <>
+              {tab === "grading" && (
+                <GradingPanel
+                  data={data}
+                  onDeal={setSelected}
+                  onSave={saveGrading}
+                />
+              )}
               {(tab === "overview" || tab === "personal") && (
                 <>
                   {tab === "personal" && admin && (

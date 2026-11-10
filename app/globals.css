@@ -1491,3 +1491,21 @@ dialog::backdrop {
     padding: 16px;
   }
 }
+.grading-row {
+  border-top: 1px solid var(--line);
+  padding: 22px 0;
+}
+.grading-row h3 {
+  margin: 0;
+}
+.grading-row summary {
+  cursor: pointer;
+  color: var(--accent);
+}
+.grading-panel .panel-heading {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.grading-row .text-button {
+  text-align: left;
+}

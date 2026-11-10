@@ -31,11 +31,12 @@ export async function readData() {
       if (data.length < 500) return rows;
     }
   }
-  const [deals, events, inventory, checkpoints] = await Promise.all([
+  const [deals, events, inventory, checkpoints, grading] = await Promise.all([
     all("deals", "created_at"),
     all("entries", "seq"),
     all("inventory_items", "created_at", true),
     all("reconciliation_checkpoints", "created_at", true),
+    all("grading", "created_at", true),
   ]);
   return {
     db,
@@ -43,6 +44,7 @@ export async function readData() {
       ...identity.data,
       inventory,
       checkpoints,
+      grading,
       deals: deals as Deal[],
       events: events as Entry[],
     } as Data,

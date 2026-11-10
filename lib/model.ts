@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { Grading } from "./grading";
 export const ids = [
   "dread",
   "1of1",
@@ -328,6 +329,7 @@ export type Data = {
   admin: boolean;
   inventory?: Inventory[];
   checkpoints?: Checkpoint[];
+  grading?: Grading[];
 };
 export const money = (c: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
