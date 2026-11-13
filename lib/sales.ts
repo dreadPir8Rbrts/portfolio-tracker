@@ -167,7 +167,9 @@ export function salePerformance(
     entry: e,
     costs: split(
       e.amount,
-      items.map((i) => i.cost),
+      items.map((i) =>
+        deal.expenseAllocation === "equal_per_card" ? i.quantity : i.cost,
+      ),
     ),
   }));
   const used = new Map<string, number>();

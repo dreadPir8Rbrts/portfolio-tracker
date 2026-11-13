@@ -85,6 +85,7 @@ export const dealSchema = z
     seller: person.optional(),
     creditObligor: person.optional(),
     funders: z.array(person).max(5).optional(),
+    expenseAllocation: z.enum(["purchase_cost", "equal_per_card"]).optional(),
   })
   .superRefine((d, c) => {
     if (
